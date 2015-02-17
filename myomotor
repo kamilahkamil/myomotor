@@ -1,0 +1,57 @@
+/* Project- Myomotor
+ */
+#include <MyoController.h>
+#define FIST_PIN 7 //setting input pin for fist gesture
+#define WAVEOUT_PIN 8 //setting input pin for waveout gesture
+
+int motorpin1=2;  //motor pin  
+int motorpin2=3;  //motor pin 
+int pwmpin=A0;     //pwm pin
+int stb=4;        //standby pin (high)
+int pmwfist = 80; //pmw corresponding to fist gesture to set motor speed
+int pmwwaveout = 0; //pmw corresponding to wave out gesture to set motor speed
+
+MyoController myo = MyoController(); //initialize object myo from MyoController class
+
+void setup()
+{
+  pinMode( motorpin1, OUTPUT ); //set motorpin as output
+  pinMode( motorpin2, OUTPUT);
+  pinMode(FIST_PIN, INPUT); //set pin as input to receive gesture information from myo
+  pinMode(WAVEOUT_PIN, INPUT);
+  pinMode( pwmpin, INPUT); //set pwm value as input to set motor speed
+  pinMode( stb, OUTPUT);
+  digitalWrite(stb, HIGH);  //sets standby pin to HIGH
+  
+  myo.initMyo(); //initialize myo object
+  
+}
+void loop()
+{
+        
+  myo.updatePose(); 
+   switch ( myo.getCurrentPose() ) {
+    case rest:
+      //if not movement/gesture, do nothing
+      digitalWrite(FIST_PIN,LOW); 
+      digitalWrite(WAVEOUT_PIN,LOW);
+      break;
+    case fist:
+      //if fist, start the motor
+      digitalRead(FIST_PIN);
+      digitalWrite(motorpin1, HIGH);
+      pmwfist = 80;
+      analogWrite(6,pmwfist); //write to motor speed
+      break;
+    case waveOut:
+      //if wave out gesture, stop the motor
+      digitalRead(WAVEOUT_PIN);
+      digitalWrite(motorpin2, LOW);
+      pmwwaveout = 0;
+      analogWrite(6,pmwwaveout);//write to motor speed
+      break;
+   } 
+   delay(100);
+  
+}
+
